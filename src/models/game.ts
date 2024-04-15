@@ -1,6 +1,6 @@
 export class Game {
   //Public weil von anderen Dateien darauf zugegriffen werden soll
-  public players: string[] = ['Achim 1', 'Achim 2', 'Achim 3'];
+  public players: string[] = [];
   public stack: string[] = [];
   public playedCards: string[] = [];
   public currentPlayer: number = 0;
