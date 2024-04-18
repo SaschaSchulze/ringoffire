@@ -10,8 +10,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
 import { inject } from '@angular/core';
-import { Firestore, collection, collectionData } from '@angular/fire/firestore';
+import { Firestore, addDoc, collection, collectionData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-game',
@@ -38,7 +39,7 @@ export class GameComponent implements OnInit {
   currentCard: string = '';
   game: Game = new Game();
 
-  constructor(public dialog: MatDialog) {
+  constructor(private route: ActivatedRoute, public dialog: MatDialog) {
     const aCollection = collection(this.firestore, 'games');
     this.games$ = collectionData(aCollection);
     this.games$.subscribe(games => {
@@ -56,8 +57,18 @@ export class GameComponent implements OnInit {
     // });
   }
 
-  newGame() {
+  async newGame() {
     this.game = new Game();
+
+    this.route.params.subscribe((params) => {
+      console.log(params['id']);
+    })
+
+    try {
+      await addDoc(collection(this.firestore, 'games'), this.game.toJson()); //Json hinzufügen in firebase mit .toJson. toJson befindet sich in game.ts
+    } catch (error) {
+      console.error('Error adding document: ', error);
+    }
   }
 
   takeCard() {
