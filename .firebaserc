@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "ring-of-fire-fd256": {
+      "hosting": {
+        "ringoffire": [
+          "ring-of-fire-fd256"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "ring-of-fire-fd256"
+  }
+}
