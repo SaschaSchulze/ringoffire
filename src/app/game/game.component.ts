@@ -10,7 +10,12 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
 import { inject } from '@angular/core';
-import { Firestore, addDoc, collection, collectionData } from '@angular/fire/firestore';
+import {
+  Firestore,
+  addDoc,
+  collection,
+  collectionData,
+} from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
@@ -30,7 +35,6 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
 })
-
 export class GameComponent implements OnInit {
   firestore: Firestore = inject(Firestore);
   games$: Observable<any[]>;
@@ -39,49 +43,46 @@ export class GameComponent implements OnInit {
   currentCard: string = '';
   game: Game = new Game();
 
-  constructor(private route: ActivatedRoute, public dialog: MatDialog) {
+  constructor(private route: ActivatedRoute, public dialog: MatDialog, firestore: Firestore) {
+    this.firestore = firestore;
     const aCollection = collection(this.firestore, 'games');
     this.games$ = collectionData(aCollection);
-    this.games$.subscribe(games => {
+    this.games$.subscribe((games) => {
       console.log('Games:', games);
     });
   }
 
   ngOnInit(): void {
-    this.newGame();
-    
-    // this.firestore.collection('games')
-    // .valueChanges()
-    // .subscribe((game:string) => {
-    //   console.log('Game update', game);
-    // });
+    //this.newGame();
   }
 
-  async newGame() {
+  newGame() {
     this.game = new Game();
 
     this.route.params.subscribe((params) => {
       console.log(params['id']);
-    })
+    });
 
     try {
-      await addDoc(collection(this.firestore, 'games'), this.game.toJson()); //Json hinzufügen in firebase mit .toJson. toJson befindet sich in game.ts
+      addDoc(collection(this.firestore, 'games'), this.game.toJson()); //Json hinzufügen in firebase mit .toJson. toJson befindet sich in game.ts
     } catch (error) {
       console.error('Error adding document: ', error);
     }
   }
 
   takeCard() {
-    if (!this.pickCardAnimation) { // wenn pickCardAnimation false ist-> ! <--. false ist standartmaßig gesetzt, siehe weiter oben. 
+    if (!this.pickCardAnimation) {
+      // wenn pickCardAnimation false ist-> ! <--. false ist standartmaßig gesetzt, siehe weiter oben.
       this.currentCard = this.game.stack.pop()!; // pop() gibt letzten Wert aus Array zurück und entfernt es aus dem Array, != TS überzeugen, dass das Array ein String ist
       this.pickCardAnimation = true;
       console.log('new card' + this.currentCard);
       console.log('Game is', this.game);
       this.game.currentPlayer++; // ++ bedeuted nächster Spieler
-      
+
       // Stelle sicher, dass der Index des aktuellen Spielers immer im Bereich der Anzahl der Spieler bleibt
       // Wenn die Anzahl der Spieler überschritten wird, wird der Index auf den ersten Spieler zurückgesetzt
-      this.game.currentPlayer = this.game.currentPlayer % this.game.players.length;
+      this.game.currentPlayer =
+        this.game.currentPlayer % this.game.players.length;
 
       setTimeout(() => {
         this.game.playedCards.push(this.currentCard);
@@ -91,11 +92,21 @@ export class GameComponent implements OnInit {
   }
 
   openDialog(): void {
-    const dialogRef = this.dialog.open(DialogAddPlayerComponent)
+    const dialogRef = this.dialog.open(DialogAddPlayerComponent);
 
     dialogRef.afterClosed().subscribe((name: string) => {
-      if(name && name.length > 0) { /*Prüft im ersten Schritt, ob die Variable existiert, &&(wenn ja), dann gehe zum 2. Schritt*/
+      if (name && name.length > 0) {
+        /*Prüft im ersten Schritt, ob die Variable existiert, &&(wenn ja), dann gehe zum 2. Schritt*/
         this.game.players.push(name);
+        console.log('Player added locally:', name);
+        try {
+          addDoc(collection(this.firestore, 'games'), this.game.toJson());
+        } catch (error) {
+          console.error('Error adding document: ', error);
+        }
+        
+        // .then(() => console.log('Player added to Firestore:', name))
+        // .catch( (error) => console.error('Error adding player to Firestore:', error));
       }
     });
   }

@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     getDocs(collection(this.firestore, "testPath")).then((response) => {
-      console.log(response.docs)
+      // console.log(response.docs)
     });
   }
 }

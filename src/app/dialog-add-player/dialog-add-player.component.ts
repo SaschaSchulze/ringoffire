@@ -17,6 +17,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 
 export class DialogAddPlayerComponent {
+
 name: string = '';
 
 constructor(public dialogRef: MatDialogRef<DialogAddPlayerComponent>) {}
