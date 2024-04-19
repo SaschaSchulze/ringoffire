@@ -99,7 +99,9 @@ export class GameComponent implements OnInit {
         /*Prüft im ersten Schritt, ob die Variable existiert, &&(wenn ja), dann gehe zum 2. Schritt*/
         this.game.players.push(name);
         console.log('Player added locally:', name);
+        
         try {
+          this.game.toJson().players.push(name);
           addDoc(collection(this.firestore, 'games'), this.game.toJson());
         } catch (error) {
           console.error('Error adding document: ', error);
