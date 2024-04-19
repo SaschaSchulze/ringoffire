@@ -1,4 +1,4 @@
-import { RouterModule, Routes } from '@angular/router';
+import { ExtraOptions, RouterModule, Routes } from '@angular/router';
 import { StartscreenComponent } from './startscreen/startscreen.component';
 import { GameComponent } from './game/game.component';
 import { NgModule } from '@angular/core';

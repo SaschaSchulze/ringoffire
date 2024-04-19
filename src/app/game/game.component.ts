@@ -43,17 +43,21 @@ export class GameComponent implements OnInit {
   currentCard: string = '';
   game: Game = new Game();
 
-  constructor(private route: ActivatedRoute, public dialog: MatDialog, firestore: Firestore) {
+  constructor(
+    private route: ActivatedRoute,
+    public dialog: MatDialog,
+    firestore: Firestore
+  ) {
     this.firestore = firestore;
     const aCollection = collection(this.firestore, 'games');
     this.games$ = collectionData(aCollection);
     this.games$.subscribe((games) => {
-      console.log('Games:', games);
+       console.log('Games:', games);
     });
   }
 
   ngOnInit(): void {
-    //this.newGame();
+    this.newGame();
   }
 
   newGame() {
@@ -97,16 +101,16 @@ export class GameComponent implements OnInit {
     dialogRef.afterClosed().subscribe((name: string) => {
       if (name && name.length > 0) {
         /*Prüft im ersten Schritt, ob die Variable existiert, &&(wenn ja), dann gehe zum 2. Schritt*/
-        this.game.players.push(name);
-        console.log('Player added locally:', name);
-        
+        // this.game.players.push(name);
+        // console.log('Player added locally:', name);
+
         try {
           this.game.toJson().players.push(name);
           addDoc(collection(this.firestore, 'games'), this.game.toJson());
         } catch (error) {
           console.error('Error adding document: ', error);
         }
-        
+
         // .then(() => console.log('Player added to Firestore:', name))
         // .catch( (error) => console.error('Error adding player to Firestore:', error));
       }
