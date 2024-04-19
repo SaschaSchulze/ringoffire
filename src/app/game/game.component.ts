@@ -15,6 +15,8 @@ import {
   addDoc,
   collection,
   collectionData,
+  doc,
+  updateDoc,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
@@ -57,7 +59,7 @@ export class GameComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.newGame();
+    // this.newGame();
   }
 
   newGame() {
@@ -105,8 +107,10 @@ export class GameComponent implements OnInit {
         // console.log('Player added locally:', name);
 
         try {
-          this.game.toJson().players.push(name);
-          addDoc(collection(this.firestore, 'games'), this.game.toJson());
+          this.game.players.push(name);
+          updateDoc(doc(this.firestore, 'games', this.route.snapshot.params['id']), {
+            players: this.game.players
+          });
         } catch (error) {
           console.error('Error adding document: ', error);
         }
