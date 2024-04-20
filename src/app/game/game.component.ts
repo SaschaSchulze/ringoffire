@@ -44,8 +44,8 @@ export class GameComponent {
   games$: Observable<any[]>;
   gameDoc: any;
 
-  pickCardAnimation = false;
-  currentCard: string = '';
+  // pickCardAnimation = false;
+  // currentCard: string = '';
   game: Game = new Game();
 
   constructor(
@@ -88,31 +88,38 @@ export class GameComponent {
   }
 
   takeCard() {
-    if (!this.pickCardAnimation) {
+    if (!this.game.pickCardAnimation) {
       // wenn pickCardAnimation false ist-> ! <--. false ist standartmaßig gesetzt, siehe weiter oben.
-      this.currentCard = this.game.stack.pop()!; // pop() gibt letzten Wert aus Array zurück und entfernt es aus dem Array, != TS überzeugen, dass das Array ein String ist
-      this.pickCardAnimation = true;
-      console.log('new card' + this.currentCard);
+      this.game.currentCard = this.game.stack.pop()!; // pop() gibt letzten Wert aus Array zurück und entfernt es aus dem Array, != TS überzeugen, dass das Array ein String ist
+      this.game.pickCardAnimation = true;
+      console.log('new card' + this.game.currentCard);
       console.log('Game is', this.game);
-      this.game.currentPlayer++; // ++ bedeuted nächster Spieler
+      this.game.currentPlayer++;
 
       // Stelle sicher, dass der Index des aktuellen Spielers immer im Bereich der Anzahl der Spieler bleibt
       // Wenn die Anzahl der Spieler überschritten wird, wird der Index auf den ersten Spieler zurückgesetzt
-      this.game.currentPlayer =
-        this.game.currentPlayer % this.game.players.length;
+      if (this.game.currentPlayer === this.game.players.length) {
+        this.game.currentPlayer = 0;
+      }
 
+        this.updateFirestore();
         setTimeout(() => {
-          this.game.playedCards.push(this.currentCard);
-          this.pickCardAnimation = false;
-          // Aktualisiere die Daten im Firestore-Dokument
-          updateDoc(this.gameDoc, {
-            currentPlayer: this.game.currentPlayer,
-            playedCards: this.game.playedCards,
-            players: this.game.players,
-            stack: this.game.stack
-          });
-        }, 1000);
+          this.game.playedCards.push(this.game.currentCard);
+          this.game.pickCardAnimation = false;
+          this.updateFirestore();
+      }, 1000);
     }
+  }
+
+  updateFirestore() {
+    updateDoc(this.gameDoc, {
+      currentPlayer: this.game.currentPlayer,
+      playedCards: this.game.playedCards,
+      players: this.game.players,
+      stack: this.game.stack,
+      pickCardAnimation: this.game.pickCardAnimation,
+      currentCard: this.game.currentCard
+    });
   }
 
   openDialog(): void {
