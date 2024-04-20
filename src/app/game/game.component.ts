@@ -76,15 +76,15 @@ export class GameComponent {
   newGame() {
     this.game = new Game();
 
-    this.route.params.subscribe((params) => {
-      console.log(params['id']);
-    });
+    // this.route.params.subscribe((params) => {
+    //   console.log(params['id']);
+    // });
 
-    try {
-      addDoc(collection(this.firestore, 'games'), this.game.toJson()); //Json hinzufügen in firebase mit .toJson. toJson befindet sich in game.ts
-    } catch (error) {
-      console.error('Error adding document: ', error);
-    }
+    // try {
+    //   addDoc(collection(this.firestore, 'games'), this.game.toJson()); //Json hinzufügen in firebase mit .toJson. toJson befindet sich in game.ts
+    // } catch (error) {
+    //   console.error('Error adding document: ', error);
+    // }
   }
 
   takeCard() {
@@ -117,13 +117,9 @@ export class GameComponent {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogAddPlayerComponent);
-
+  
     dialogRef.afterClosed().subscribe((name: string) => {
       if (name && name.length > 0) {
-        /*Prüft im ersten Schritt, ob die Variable existiert, &&(wenn ja), dann gehe zum 2. Schritt*/
-        // this.game.players.push(name);
-        // console.log('Player added locally:', name);
-
         try {
           this.game.players.push(name);
           updateDoc(doc(this.firestore, 'games', this.route.snapshot.params['id']), {
@@ -132,9 +128,6 @@ export class GameComponent {
         } catch (error) {
           console.error('Error adding document: ', error);
         }
-
-        // .then(() => console.log('Player added to Firestore:', name))
-        // .catch( (error) => console.error('Error adding player to Firestore:', error));
       }
     });
   }

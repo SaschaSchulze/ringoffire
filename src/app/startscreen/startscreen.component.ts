@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Firestore, addDoc, collection, collectionData } from '@angular/fire/firestore';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Game } from '../../models/game';
 
 
 @Component({
@@ -10,13 +12,17 @@ import { Router } from '@angular/router';
   styleUrl: './startscreen.component.scss'
 })
 export class StartscreenComponent {
+  game: Game = new Game();
 
-  constructor(private router: Router) { }
+  constructor(private firestore: Firestore,  private router: Router, private route: ActivatedRoute) { }
 
-  newGame() {
-    //Start game
-    this.router.navigateByUrl('/game');
+  async newGame() {
+    try {
+      const docRef = await addDoc(collection(this.firestore, 'games'), this.game.toJson());
+      const gameId = docRef.id;
+      this.router.navigateByUrl(`/game/${gameId}`);
+    } catch (error) {
+      console.error('Error adding document: ', error);
+    }
   }
-  
-
 }
