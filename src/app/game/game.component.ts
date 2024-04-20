@@ -11,11 +11,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
 import { inject } from '@angular/core';
 import {
+  DocumentSnapshot,
   Firestore,
   addDoc,
   collection,
   collectionData,
   doc,
+  onSnapshot,
   updateDoc,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
@@ -37,9 +39,10 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
 })
-export class GameComponent implements OnInit {
+export class GameComponent {
   firestore: Firestore = inject(Firestore);
   games$: Observable<any[]>;
+  gameDoc: any;
 
   pickCardAnimation = false;
   currentCard: string = '';
@@ -51,16 +54,24 @@ export class GameComponent implements OnInit {
     firestore: Firestore
   ) {
     this.firestore = firestore;
-    const aCollection = collection(this.firestore, 'games');
-    this.games$ = collectionData(aCollection);
-    this.games$.subscribe((games) => {
-       console.log('Games:', games);
+    const gameId = this.route.snapshot.params['id'];
+    this.gameDoc = doc(this.firestore, 'games', gameId);
+    console.log('Games:', gameId);
+  
+    // Firestore-Listener für Spieländerungen
+    onSnapshot(this.gameDoc, (snapshot: DocumentSnapshot) => {
+      const gameData = snapshot.data() as Game;
+      if (gameData) {
+        this.game = gameData;
+      }
     });
+    
+    this.games$ = collectionData(collection(this.firestore, 'games'));
   }
 
-  ngOnInit(): void {
-    // this.newGame();
-  }
+  // ngOnInit(): void {
+  //   // this.newGame();
+  // }
 
   newGame() {
     this.game = new Game();
@@ -90,10 +101,17 @@ export class GameComponent implements OnInit {
       this.game.currentPlayer =
         this.game.currentPlayer % this.game.players.length;
 
-      setTimeout(() => {
-        this.game.playedCards.push(this.currentCard);
-        this.pickCardAnimation = false;
-      }, 1000);
+        setTimeout(() => {
+          this.game.playedCards.push(this.currentCard);
+          this.pickCardAnimation = false;
+          // Aktualisiere die Daten im Firestore-Dokument
+          updateDoc(this.gameDoc, {
+            currentPlayer: this.game.currentPlayer,
+            playedCards: this.game.playedCards,
+            players: this.game.players,
+            stack: this.game.stack
+          });
+        }, 1000);
     }
   }
 

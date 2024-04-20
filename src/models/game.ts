@@ -6,6 +6,7 @@ export class Game {
   public currentPlayer: number = 0;
 
   constructor() {
+    this.stack = [];
     for (let i = 1; i < 14; i++) {
       this.stack.push('spade_' + i);
       this.stack.push('hearts_' + i);
