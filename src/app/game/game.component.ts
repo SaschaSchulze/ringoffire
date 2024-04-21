@@ -22,6 +22,7 @@ import {
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { MobilePlayerComponent } from '../mobile-player/mobile-player.component';
 
 @Component({
   selector: 'app-game',
@@ -35,6 +36,7 @@ import { ActivatedRoute } from '@angular/router';
     MatIconModule,
     DialogAddPlayerComponent,
     MatDialogModule,
+    MobilePlayerComponent,
   ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
